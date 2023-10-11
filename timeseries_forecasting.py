@@ -36,9 +36,60 @@ add = seasonal_decompose(df['Number_of_Passengers'], model='additive', period=30
 
 mult.plot().suptitle('Multiplicative')
 add.plot().suptitle('Additive')
-plt.show()
+plt.clf()
 
 # Multiplicative residuals look random (there's little seasonality) so we'll use it
 
 #%%
 # HOW TO MAKE A TIME SERIES STATIONARY?
+# The statistical properties of the series like mean, variance and 
+# autocorrelation are constant over time.
+
+# Autoregressive forecasting models are essentially linear regression models 
+# that utilize the lag(s) of the series itself as predictors.
+
+# 
+   # Differencing the Series (once or more)
+   # Take the log of the series
+   # Take the nth root of the series
+   # Combination of the above
+#
+#%%
+# Detrend a time series
+
+# Using scipy: subtract the line of best fit
+from scipy import signal
+
+detrend = signal.detrend(df['Number_of_Passengers'].values)
+
+plt.plot(detrend)
+plt.title('Detrended by the least squares fit')
+plt.clf()
+
+# Using statmodels: subtracting the trend component
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+detrend = df['Number_of_Passengers'].values - mult.trend
+
+plt.plot(detrend)
+plt.title('Detrended by subtracting the trend component')
+plt.clf()
+#
+#%%
+# Deseasonalize a time series
+
+deseason = df['Number_of_Passengers'].values / mult.seasonal
+
+plt.plot(deseason)
+plt.title('Deseasonalized')
+plt.clf()
+
+#
+#%%
+# Test the seasonality of a time series
+
+from pandas.plotting import autocorrelation_plot
+
+autocorrelation_plot(df['Number_of_Passengers'].tolist())
+
+plt.show()
