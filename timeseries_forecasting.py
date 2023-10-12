@@ -92,4 +92,44 @@ from pandas.plotting import autocorrelation_plot
 
 autocorrelation_plot(df['Number_of_Passengers'].tolist())
 
-plt.show()
+plt.clf()
+
+#%%
+# Autocorrelation Function and Partial Autocorrelation Function
+from statsmodels.tsa.stattools import acf, pacf
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
+fig, ax = plt.subplots(1, 2, figsize=(16, 5))
+plot_acf(df['Number_of_Passengers'].tolist(), lags=60, ax=ax[0])
+plot_pacf(df['Number_of_Passengers'].tolist(), lags=60, ax=ax[1], auto_ylims=True)
+plt.clf()
+
+#%%
+
+# Lag Plots
+
+from pandas.plotting import lag_plot
+plt.rcParams.update({'ytick.left' : False, 'axes.titlepad':10})
+
+# Plot
+fig, axes = plt.subplots(1, 4, figsize=(10,3), sharex=True, sharey=True, dpi=100)
+for i, ax in enumerate(axes.flatten()[:4]):
+    lag_plot(df['Number_of_Passengers'], lag=i+10, ax=ax, c='firebrick')
+    ax.set_title('Lag ' + str(i+10))
+
+fig.suptitle('Lag Plots of Air Passengers', y=1.1)    
+plt.clf()
+
+#%%
+
+# Granger Causality test
+
+from statsmodels.tsa.stattools import grangercausalitytests
+
+data = pd.read_csv('/home/mdocarm/Downloads/archive(1)/dataset.txt')
+data['date'] = pd.to_datetime(data['date'])
+data['month'] = data.date.dt.month
+grangercausalitytests(data[['value', 'month']], maxlag=5)
+
+# p-value being zero for all tests shows that the months can be used to 
+# forecast the time series
